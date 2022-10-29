@@ -2,9 +2,9 @@
   <div id="app">
     <div class="todo-container">
       <div class="todo-wrap">
-    <MyHeader :addTodo = 'addTodo'></MyHeader>
+    <MyHeader @addTodo = 'addTodo'></MyHeader>
     <MyList :todo ='todo' :checkTodo="checkTodo" :deleteTodo="deleteTodo"></MyList>
-    <MyFooter :todo ='todo' :checkAllTodo="checkAllTodo"  :clearAllTodo="clearAllTodo"></MyFooter>
+    <MyFooter :todo ='todo' @checkAllTodo="checkAllTodo"  @clearAllTodo="clearAllTodo"></MyFooter>
       </div>
     </div>
   </div>
@@ -43,6 +43,14 @@ export default {
           todo.done = !todo.done;
         }
       });
+    }, updateTodo(id,title) {
+      //遍历选择 过滤出需要的todo对象
+      this.todo.forEach((todo) => {
+        if (todo.id === id) {
+          //布尔值取反
+          todo.title = title;
+        }
+      });
     },
     deleteTodo(id) {
       //这个过滤器filter()内的是形参可以随便写但不能用todo 和 关键字do
@@ -68,11 +76,19 @@ export default {
         //将对象转成字符串
       }
     }
-  }
+  },
+  mounted() {
+    this.$bus.$on('checkTodo',this.checkTodo)
+    this.$bus.$on('updateTodo',this.updateTodo)
+    this.$bus.$on('deleteTodo',this.deleteTodo)
+  },
+  beforeDestroy() {
+    this.$bus.$off(['checkTodo','deleteTodo','updateTodo'])
+  },
 }
 </script>
-
-<style scoped >
+<!-- 总体的样式不用加scoped -->
+<style>
 body {
   background: #fff;
 }
